@@ -9,12 +9,6 @@ const routes: Array<RouteConfig> = [
     name: "Home",
     component: () => import(/* webpackChunkName: "home" */ "@/pages/Home.vue"), //dynamic import of component and dependency
   },
-  {
-    path: "/about",
-    name: "About",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "@/pages/About.vue"), //dynamic import of component and dependency
-  },
 ];
 
 const router = new VueRouter({
