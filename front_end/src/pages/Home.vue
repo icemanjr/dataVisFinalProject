@@ -22,9 +22,9 @@ export default class Home extends Vue {}
 
 <style lang="scss">
 .home {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100%;
+  display: grid;
+  grid-template-columns: 60% 40%;
+  
 }
 </style>
