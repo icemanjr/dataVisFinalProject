@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    data: []
+    data: null
   },
   mutations: {
     init: async (state) => {
@@ -14,7 +14,6 @@ export default new Vuex.Store({
       const data = await axios.get('http://localhost:3000/data');
       console.log(`It took ${new Date().getTime() - t.getTime()} ms to get all of the data`)
       
-      console.log(data)
       state.data = data.data
 
     }
