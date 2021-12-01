@@ -1,7 +1,9 @@
 <template>
   <div class="home">
     <Map />
-    <LineGraphs />
+    <div>
+      <LineGraphs v-for="(el, index) in getArray()" :key="index" :index="index" />
+    </div>
   </div>
 </template>
 
@@ -17,7 +19,11 @@ import LineGraphs from "@/components/LineGraphs.vue";
     LineGraphs,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  getArray() {
+    return new Array(50)
+  }
+}
 </script>
 
 <style lang="scss">

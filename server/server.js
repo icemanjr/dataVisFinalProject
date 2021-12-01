@@ -1,19 +1,42 @@
 const express = require('express');
+const cors = require('cors');
+const { MongoClient } = require('mongodb')
 const app = express();
+app.use(cors());
 const port = 3000;
 
-const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb://localhost:27017';
 const dbName = 'finalProj';
 const client = new MongoClient(url);
 
-app.get("/data", (req, res) => {
-     db.find({}, {}).toArray(function(e, r){
-          if (e) throw e;
-          res.status(200);
-          res.append("Content-Type", "application/json");
-          res.send(r);
-     });
+app.get("/data", async (req, res) => {
+     await client.connect();
+     const db = client.db(dbName);
+     const collections = [
+         "all_homes",
+         "all_homes_rental",
+         "five_plus_bed",
+         "five_plus_bed_rental",
+         "four_bed",
+         "four_bed_rental",
+         "one_bed",
+         "one_bed_rental",
+         "three_bed",
+         "three_bed_rental",
+         "two_bed",
+         "two_bed_rental"
+
+     ]
+     const results = {}
+     for (const col of collections){
+          const collection = db.collection("all_homes");
+          const result = await collection.find().toArray();
+          results[col] = result
+
+
+     }
+     client.close();
+     res.send(results)
 });
 
 

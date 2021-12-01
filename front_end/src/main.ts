@@ -7,8 +7,13 @@ import "@/assets/css/styles.scss";
 
 Vue.config.productionTip = false;
 
+
+
 new Vue({
   router,
   store,
   render: (h) => h(App),
+  async created() {
+    this.$store.commit("init");
+  },
 }).$mount("#app");
