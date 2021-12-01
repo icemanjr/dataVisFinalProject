@@ -16,9 +16,6 @@ export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
   margins = 200
-  commit() {
-    this.$store.commit("init")
-  }
 
   drawGraph(data) {
     if (!data) return;
