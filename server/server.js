@@ -27,11 +27,13 @@ app.get("/data", async (req, res) => {
          "two_bed_rental"
 
      ]
-     const results = [];
-     for (const col in collections){
+     const results = {}
+     for (const col of collections){
           const collection = db.collection("all_homes");
-          const result = await collection.find({}).toArray();
-          results.push(result)
+          const result = await collection.find().toArray();
+          results[col] = result
+
+
      }
      client.close();
      res.send(results)
