@@ -80,25 +80,11 @@ export default class LineGraphs extends Vue {
       .attr("y", 0) 
       .style("font-family", "calibri")
       .text(data[this.index].RegionName);
-
-
-
-
-      
-    
-
-
-
-    
-
-
-
-
-
   }
   
   mounted() {
     this.$store.watch((state) =>{
+      if (!state.data) return;
      return this.drawGraph(state.data["all_homes"])
     })
   }

@@ -15,6 +15,7 @@
     "d3": "^7.1.1",
     "moment": "2.29.1",
     "register-service-worker": "1.7.1",
+    "topojson-client": "^3.1.0",
     "vue": "2.6.12",
     "vue-router": "3.4.9",
     "vuex": "3.5.1"

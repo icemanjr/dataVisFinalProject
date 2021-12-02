@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs')
 const cors = require('cors');
 const { MongoClient } = require('mongodb')
 const app = express();
@@ -8,6 +9,10 @@ const port = 3000;
 const url = 'mongodb://localhost:27017';
 const dbName = 'finalProj';
 const client = new MongoClient(url);
+
+app.get("/geojson", async (req, res) => {
+     res.sendFile(__dirname + "/us-states.json")
+})
 
 app.get("/data", async (req, res) => {
      await client.connect();
