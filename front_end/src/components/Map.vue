@@ -1,5 +1,7 @@
 <template>
-  <div class="map"></div>
+  <div class="map">
+    <p>hi{{selected()}}</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,6 +14,7 @@ import * as d3 from "d3";
 })
 export default class Map extends Vue {
   data = () => this.$store.state.data;
+  selected = () => this.$store.state.selectedState;
   width = 600;
   height = 500;
 
@@ -42,10 +45,14 @@ export default class Map extends Vue {
           d3.select(this)
             .style("fill", "blue")
         })
+        .on("click", (d,e) => {
+          this.$store.commit("changeSelectedState", e.properties.name)
+        })
     })
   }
 
   mounted() {
+    
     this.$store.watch((state) =>{
       if (!state.data) return;
      return this.drawMap(state.data["all_homes"])
