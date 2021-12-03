@@ -1,6 +1,6 @@
 <template>
   <div class="map">
-    <p>hi{{selected()}}</p>
+    <p>{{selected()}}</p>
   </div>
 </template>
 
@@ -52,7 +52,7 @@ export default class Map extends Vue {
   }
 
   mounted() {
-    
+
     this.$store.watch((state) =>{
       if (!state.data) return;
      return this.drawMap(state.data["all_homes"])
