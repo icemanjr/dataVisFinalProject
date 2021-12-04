@@ -1,7 +1,5 @@
 <template>
-  <div class="line-graphs">
     <div id="line-graph"></div>
-  </div>
 </template>
 
 <script lang="ts">
