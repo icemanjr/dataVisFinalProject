@@ -34,6 +34,6 @@ export default class Home extends Vue {
 }
 .line-graphs {
   display: grid;
-  grid-template-columns: 33% 33% 33%;
+  grid-template-columns: 25% 25% 25% 25%;
 }
 </style>
