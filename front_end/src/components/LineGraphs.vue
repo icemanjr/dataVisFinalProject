@@ -15,15 +15,19 @@ import * as d3 from "d3";
 export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
-  margins = 200
+  margins = {"top": 20, "bottom": 30, "left": 50, "right": 20};
 
   drawGraph(data) {
     if (!data) return;
-    const svg = d3.select("#line-graph").append("svg").attr("width", "600").attr("height", "400");
-    const g = svg.append("g").attr("transform", "translate(" + 100 + "," + 100 + ")");
-    const width = svg.attr("width") - this.margins;
-    const height = svg.attr("height") - this.margins;
-    const validKeys = Object.keys(data[this.index]).slice(10,200)
+    const height = 250 - this.margins.top - this.margins.bottom;
+    const width = 280 - this.margins.left - this.margins.right;
+    const svg = d3.select(".line-graphs")
+        .append("svg")
+        .attr("width", width + this.margins.left + this.margins.right)
+        .attr("height", height + this.margins.top + this.margins.bottom);
+    const g = svg.append("g")
+        .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+    const validKeys = Object.keys(data[this.index]).slice(170,300)
     const formatDate = key => {
       const splitDate = key.split("-")
       return new Date(splitDate[0], splitDate[1]-1, splitDate[2])
@@ -54,13 +58,19 @@ export default class LineGraphs extends Vue {
 
 
     g.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xaxis);
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xaxis)
+    .selectAll("text")
+        .attr("y", 0)
+        .attr("x", 9)
+        .attr("dy", ".35em")
+        .attr("transform", "rotate(90)")
+        .style("text-anchor", "start");
 
     g.append("g")
-        .attr("class", "axis")
-        .call(yaxis);
+      .attr("class", "axis")
+      .call(yaxis);
 
     g.append('svg:path')
       .attr("d", lineFunc(validKeys))
@@ -85,6 +95,7 @@ export default class LineGraphs extends Vue {
   mounted() {
     this.$store.watch((state) =>{
       if (!state.data) return;
+      console.log(state.data);
      return this.drawGraph(state.data["all_homes"])
     })
   }
@@ -110,7 +121,7 @@ export default class LineGraphs extends Vue {
      .axis text{
          fill: black;
          font-weight: bold;
-         font-size: 14px;
+         font-size: smaller;
          font-family:"Arial Black", Gadget, sans-serif;
      } 
 
