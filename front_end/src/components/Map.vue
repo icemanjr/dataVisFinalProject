@@ -38,12 +38,16 @@ export default class Map extends Vue {
         .enter()
         .append("path")
         .attr("d", path)
-        .style("stroke", "#f00")
+        .style("stroke", "#000")
         .style("stroke-width", "1")
-        .style("fill", "white")
+        .style("fill", "#fff")
         .on("mouseover", function(d,e) {
           d3.select(this)
-            .style("fill", "blue")
+            .style("fill", "#aaf")
+        })
+        .on("mouseout", function(d,e) {
+          d3.select(this)
+            .style("fill", "#fff")
         })
         .on("click", (d,e) => {
           this.$store.commit("changeSelectedState", e.properties.name)
@@ -67,6 +71,6 @@ export default class Map extends Vue {
 @import "@/assets/css/styles.scss";
 .map {
   @include component;
-  background-color: pink;
+  background-color: rgb(240, 240, 240);
 }
 </style>

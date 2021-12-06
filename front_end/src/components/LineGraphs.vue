@@ -1,5 +1,5 @@
 <template>
-    <div id="line-graph"></div>
+    <div :id="`line-graph${index}`"></div>
 </template>
 
 <script lang="ts">
@@ -13,12 +13,12 @@ import * as d3 from "d3";
 export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
-  margins = 200
+  margins = 100
 
   drawGraph(data) {
     if (!data) return;
-    const svg = d3.select("#line-graph").append("svg").attr("width", "600").attr("height", "400");
-    const g = svg.append("g").attr("transform", "translate(" + 100 + "," + 100 + ")");
+    const svg = d3.select(`#line-graph${this.index}`).append("svg").attr("width", "500").attr("height", "250");
+    const g = svg.append("g").attr("transform", "translate(" + 100 + "," + 50 + ")");
     const width = svg.attr("width") - this.margins;
     const height = svg.attr("height") - this.margins;
     const validKeys = Object.keys(data[this.index]).slice(10,200)
@@ -47,7 +47,7 @@ export default class LineGraphs extends Vue {
         return yScale(getYValue(key))
       })
 
-    const yaxis = d3.axisLeft().scale(yScale); 
+    const yaxis = d3.axisLeft().scale(yScale).ticks(5); 
     const xaxis = d3.axisBottom().scale(xScale);
 
 
@@ -58,7 +58,8 @@ export default class LineGraphs extends Vue {
 
     g.append("g")
         .attr("class", "axis")
-        .call(yaxis);
+        .call(yaxis)
+        ;
 
     g.append('svg:path')
       .attr("d", lineFunc(validKeys))
@@ -72,7 +73,6 @@ export default class LineGraphs extends Vue {
       }) ;
 
     g.append("text")
-      .attr("class", "x label")
       .attr("text-anchor", "end")
       .attr("x", width)
       .attr("y", 0) 
@@ -93,27 +93,30 @@ export default class LineGraphs extends Vue {
 @import "@/assets/css/styles.scss";
 .line-graphs {
   @include component;
-  background-color: lightblue;
 }
 .axis path{
          stroke:black;
          stroke-width:2px ;
-     }   
-
-     .axis line{
-         stroke: black;
-         stroke-width: 1.5px;
-     } 
-  
-     .axis text{
-         fill: black;
-         font-weight: bold;
-         font-size: 14px;
-         font-family:"Arial Black", Gadget, sans-serif;
-     } 
-
-     .legend text{
-         fill:  black;
-         font-family:"Arial Black", Gadget, sans-serif;
-     }
+}   
+.axis line{
+    stroke: black;
+    stroke-width: 1.5px;
+} 
+.axis text{
+    fill: black;
+    font-weight: bold;
+    font-size: 14px;
+    font-family:"Arial Black", Gadget, sans-serif;
+} 
+.legend text{
+    fill:  black;
+    font-family:"Arial Black", Gadget, sans-serif;
+}
+.axis {
+  text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+  }
+}
 </style>
