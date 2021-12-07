@@ -1,5 +1,5 @@
 <template>
-    <div :id="`line-graph${index}`" class="line-graph">{{title}}</div>
+    <div :id="`line-graph${index}`" class="line-graph"></div>
 </template>
 
 <script lang="ts">
