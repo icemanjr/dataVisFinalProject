@@ -42,6 +42,7 @@ export default class Home extends Vue {
     {category: "three_bed", maxValue: this.maxBuy},
     {category: "four_bed", maxValue: this.maxBuy},
     {category: "five_plus_bed", maxValue: this.maxBuy},
+    // {category: "all_homes_rental", maxValue: this.maxRent},
   ]
   mounted() {
     console.log(this.params)

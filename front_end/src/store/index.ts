@@ -4,6 +4,18 @@ import axios from "axios";
 
 Vue.use(Vuex);
 
+const getMaxFromData = (dataArray)  => {
+      console.log(dataArray)
+      let maxVal = 0;
+      for (const category of dataArray) {
+        const t = new Date()
+        for (const val of Object.values(category.data)) {
+          maxVal = Math.max(maxVal, +val)
+        }
+      }
+      return maxVal
+}
+
 export default new Vuex.Store({
   state: {
     data: null,
@@ -14,7 +26,7 @@ export default new Vuex.Store({
   getters: {
     getMaxBuy: (state) => {
       function stateFilter(dat: any){
-        return dat.RegionName === state.selectedState;
+        return dat.state === state.selectedState;
       }
       const st = state as any;
       const buyAvg = st.data["all_homes"].filter(stateFilter);
@@ -24,16 +36,7 @@ export default new Vuex.Store({
       const buy4 = st.data["four_bed"].filter(stateFilter);
       const buy5 = st.data["five_plus_bed"].filter(stateFilter);
       const buy = [buyAvg[0], buy1[0], buy2[0], buy3[0], buy4[0], buy5[0]];
-
-      let maxBuy = 0;
-      let tempMax;
-      for (let i=0; i<6; i++) {
-        tempMax = Object.values(buy[i]).slice(state.startIndex, state.endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)});
-        if (maxBuy < tempMax) {
-          maxBuy = tempMax;
-        }
-      }
-      return maxBuy
+      return getMaxFromData(buy)
     },
     getMaxRent: (state) => {
       function stateFilter(dat: any){
@@ -47,18 +50,19 @@ export default new Vuex.Store({
       const rent4 = st.data["four_bed_rental"].filter(stateFilter);
       const rent5 = st.data["five_plus_bed_rental"].filter(stateFilter);
       const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
-      let tempMax;
-      let maxRent = 0;
-      for (let i=0; i<6; i++) {
-        console.log(rent[i])
-        console.log(rent[i].slice(state.startIndex, state.endIndex))
-        console.log(rent[i].slice(state.startIndex, state.endIndex).map(Number))
-        tempMax = Object.values(rent[i]).slice(state.startIndex, state.endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
-        if (maxRent < tempMax) {
-          maxRent = tempMax;
-        }
-      }
-      return maxRent;
+      return getMaxFromData(rent)
+      // let tempMax;
+      // let maxRent = 0;
+      // for (let i=0; i<6; i++) {
+      //   console.log(rent[i])
+      //   console.log(rent[i].slice(state.startIndex, state.endIndex))
+      //   console.log(rent[i].slice(state.startIndex, state.endIndex).map(Number))
+      //   tempMax = Object.values(rent[i]).slice(state.startIndex, state.endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
+      //   if (maxRent < tempMax) {
+      //     maxRent = tempMax;
+      //   }
+      // }
+      // return maxRent;
     }
 
   },

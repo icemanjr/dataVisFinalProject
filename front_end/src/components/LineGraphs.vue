@@ -22,7 +22,7 @@ export default class LineGraphs extends Vue {
     if (!data) return;
 
     function stateFilter(dat){
-      return dat.RegionName === selectedState;
+      return dat.state === selectedState;
     }
     const filtered_data = data[this.category].filter(d => stateFilter(d))[0]
     const filtered_data_keys = Object.keys(filtered_data).slice(7, filtered_data.length) // 7 is where the data starts... 
