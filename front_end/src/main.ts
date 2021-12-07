@@ -14,6 +14,7 @@ new Vue({
   store,
   render: (h) => h(App),
   async created() {
+    // this.$store.commit("changeSelectedState", "Utah")
     this.$store.commit("init");
   },
 }).$mount("#app");
