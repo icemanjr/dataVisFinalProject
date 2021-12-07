@@ -28,7 +28,7 @@ export default class Home extends Vue {
 .home {
   height: 100%;
   display: grid;
-  grid-template-rows: 66% auto; 
+  grid-template-rows: 50% auto; 
 }
 .line-graphs {
   display: grid;

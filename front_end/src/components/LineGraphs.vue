@@ -27,6 +27,7 @@ export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
   margins = {"top": 15, "bottom": 50, "left": 70, "right": 5}
+  unwatch = null;
 
   drawGraph(data, selectedState) {
     if (!data) return;
@@ -58,20 +59,23 @@ export default class LineGraphs extends Vue {
     const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
     const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
 
-    const validKeysBuy = Object.keys(buyAvg[0]).slice(188, 295);
-    const validKeysRent = Object.keys(rentAvg[0]).slice(188, 295);
+    const startIndex = 188;
+    const endIndex = 295;
+
+    const validKeysBuy = Object.keys(buyAvg[0]).slice(startIndex, endIndex);
+    const validKeysRent = Object.keys(rentAvg[0]).slice(startIndex, endIndex);
 
     let maxBuy = 0;
     let maxRent = 0;
     let tempMax;
     for (let i=0; i<6; i++) {
-      tempMax = Object.values(buy[i]).slice(188, 295).map(Number).reduce(function(a,b){return Math.max(a,b)});
+      tempMax = Object.values(buy[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)});
       if (maxBuy < tempMax) {
         maxBuy = tempMax;
       }
     }
     for (let i=0; i<6; i++) {
-      tempMax = Object.values(rent[i]).slice(188, 295).map(Number).reduce(function(a,b){return Math.max(a,b)})
+      tempMax = Object.values(rent[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
       if (maxRent < tempMax) {
         maxRent = tempMax;
       }
@@ -218,10 +222,12 @@ export default class LineGraphs extends Vue {
   }
   
   mounted() {
-    this.$store.watch((state) =>{
+    const unwatch = this.$store.watch((state) =>{
       if (!state.data) return;
-     return this.drawGraph(state.data, state.selectedState)
+      this.drawGraph(state.data, state.selectedState)
+      this.unwatch()
     })
+    this.unwatch = unwatch
   }
 }
 </script>
