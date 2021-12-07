@@ -15,25 +15,33 @@ import * as d3 from "d3";
 export default class Map extends Vue {
   data = () => this.$store.state.data;
   selected = () => this.$store.state.selectedState;
-  width = 600;
-  height = 500;
+  width_pct = 66;
+  height_pct = 100;
+  height_margin = 40;
+  legendWidth = 400;
+  legendHeight = 20;
+
 
   drawMap(data) {
     if (!data) return;
     const colors = ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"];
     const fill = d3.scaleQuantile().range(colors);
     const getFillVal = d => parseFloat(d["2020-03-31"]) / parseFloat(d["2005-01-31"]) * 100;
+    const w = d3.select(".map")
+    console.log(w, w._groups[0][0].getBoundingClientRect())
     fill.domain(d3.extent(data, d => getFillVal(d)));
 
     const svg = d3.select(".map")
       .append("svg")
-      .attr("width", this.width)
-      .attr("height", this.height)
+      .attr("width", this.width_pct + "%")
+      .attr("height", this.height_pct + "%");
+    const svgWidth =  svg._groups[0][0].getBoundingClientRect().width
+    const svgHeight = svg._groups[0][0].getBoundingClientRect().height
 
     d3.json("http://localhost:3000/geojson").then((us) => {
       const projection = d3.geoAlbersUsa()
-        .scale(700)
-        .translate([this.width / 2, this.height / 2])
+        .scale(svgHeight * 1.5)
+        .translate([svgWidth / 2 , svgHeight / 2])
 
       const path = d3.geoPath()
         .projection(projection)
@@ -69,14 +77,12 @@ export default class Map extends Vue {
           this.$store.commit("changeSelectedState", e.properties.name)
         })
         const fillRange = [];
-        const legendWidth = 400;
-        const legendHeight = 20;
-        const legendExtend = d3.extent(data, d =>  getFillVal(d));
-        const min = legendExtend[0];
-        const max = legendExtend[1];
+        const legendExtent = d3.extent(data, d =>  getFillVal(d));
+        const min = legendExtent[0];
+        const max = legendExtent[1];
 
         for(let i = 0;i <= colors.length;i++)
-        fillRange.push(legendWidth/colors.length * i);
+        fillRange.push(this.legendWidth/colors.length * i);
 
         let axisScale = d3.scaleQuantile().range(fillRange);
 
@@ -90,12 +96,12 @@ export default class Map extends Vue {
 
         let legendaxis = d3.axisBottom(axisScale).tickFormat(x=>  x.toFixed(1) + "%");
 
-        let legend = svg.selectAll(".map").data(colors).enter().append("g").attr("transform", "translate(" + (600 / 2 - legendWidth / 2) + ", " + (this.height - legendHeight * 2 ) + ")")
-        legend.append("rect").attr("width", legendWidth/colors.length).attr("height", legendHeight).style("fill", d=>d)
-            .attr("x", (d,i)=> legendWidth/colors.length * i)
+        let legend = svg.selectAll(".map").data(colors).enter().append("g").attr("transform", "translate(" + (svgWidth / 2 - this.legendWidth / 2) + ", " + ( 10 ) + ")")
+        legend.append("rect").attr("width", this.legendWidth/colors.length).attr("height", this.legendHeight).style("fill", d=>d)
+            .attr("x", (d,i)=> this.legendWidth/colors.length * i)
 
         svg.append("g").attr("class", "axis")
-            .attr("transform", "translate(" + (600 / 2 - legendWidth/2) + ", " + (this.height - legendHeight) + ")")
+            .attr("transform", "translate(" + (svgWidth / 2 - this.legendWidth/2) + ", " + (this.legendHeight + 10) + ")")
             .call(legendaxis);
     })
   }
