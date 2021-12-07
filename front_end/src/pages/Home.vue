@@ -1,9 +1,7 @@
 <template>
   <div class="home">
     <Map />
-    <div class="line-graphs">
-      <LineGraphs v-for="(el, index) in getArray()" :key="index" :index="index" />
-    </div>
+    <LineGraphs />
   </div>
 </template>
 
@@ -34,6 +32,7 @@ export default class Home extends Vue {
 }
 .line-graphs {
   display: grid;
+  width: 100%;
   grid-template-columns: 25% 25% 25% 25%;
 }
 </style>
