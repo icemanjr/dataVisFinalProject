@@ -26,8 +26,10 @@ export default class Map extends Vue {
     if (!data) return;
     const colors = ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"];
     const fill = d3.scaleQuantile().range(colors);
-    const getFillVal = d => parseFloat(d["2020-03-31"]) / parseFloat(d["2005-01-31"]) * 100;
-    const w = d3.select(".map")
+    const getFillVal = d => {
+      const vals = Object.values(d.data);
+      return +vals[vals.length-1] / +vals[0] * 100;
+    };
     fill.domain(d3.extent(data, d => getFillVal(d)));
 
     const svg = d3.select(".map")
@@ -54,7 +56,7 @@ export default class Map extends Vue {
         .style("stroke-width", "1")
         .style("fill", function(d,e) {
           for (const state of data) {
-            if (state.RegionName === d.properties.name) {
+            if (state.state === d.properties.name) {
               return fill(getFillVal(state))
             }
           }
@@ -68,7 +70,9 @@ export default class Map extends Vue {
           d3.select(this)
             .style("fill", function(d,e) {
               for (const state of data) {
-                if (state.RegionName === d.properties.name) return fill(getFillVal(state))
+                if (state.state === d.properties.name) {
+                  return fill(getFillVal(state))
+                }
               }
             })
         })
