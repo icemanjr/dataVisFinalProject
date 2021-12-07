@@ -9,8 +9,6 @@
         :category="param.category"
         :maxValue="param.maxValue"
       />
-      <!-- <LineGraphs :index="0" :category="'all_homes'" :maxValue="maxBuy"/> -->
-      <!-- <LineGraphs :index="1" :category="'five_plus_bed_rental'" :maxValue="maxRent"/> -->
     </div>
   </div>
 </template>
