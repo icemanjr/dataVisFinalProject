@@ -1,5 +1,7 @@
 <template>
-  <div class="map"></div>
+  <div class="map">
+    <p>{{selected()}}</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,6 +14,7 @@ import * as d3 from "d3";
 })
 export default class Map extends Vue {
   data = () => this.$store.state.data;
+  selected = () => this.$store.state.selectedState;
   width = 600;
   height = 500;
 
@@ -35,17 +38,25 @@ export default class Map extends Vue {
         .enter()
         .append("path")
         .attr("d", path)
-        .style("stroke", "#f00")
+        .style("stroke", "#000")
         .style("stroke-width", "1")
-        .style("fill", "white")
+        .style("fill", "#fff")
         .on("mouseover", function(d,e) {
           d3.select(this)
-            .style("fill", "blue")
+            .style("fill", "#aaf")
+        })
+        .on("mouseout", function(d,e) {
+          d3.select(this)
+            .style("fill", "#fff")
+        })
+        .on("click", (d,e) => {
+          this.$store.commit("changeSelectedState", e.properties.name)
         })
     })
   }
 
   mounted() {
+
     this.$store.watch((state) =>{
       if (!state.data) return;
      return this.drawMap(state.data["all_homes"])
@@ -60,6 +71,6 @@ export default class Map extends Vue {
 @import "@/assets/css/styles.scss";
 .map {
   @include component;
-  background-color: pink;
+  background-color: rgb(240, 240, 240);
 }
 </style>
