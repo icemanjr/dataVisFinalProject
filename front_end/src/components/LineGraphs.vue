@@ -83,8 +83,18 @@ export default class LineGraphs extends Vue {
       .attr("stroke-width", 2)
       .attr("fill", "none");
   }
+  updateGraph(state) {
+    console.log('updating graph')
+  }
   
   mounted() {
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      console.log(mutation,state)
+      if (mutation.type === "changeSelectedState") {
+        this.updateGraph(state)
+      }
+
+    })
     const unwatch = this.$store.watch((state) =>{
       if (!state.data) return;
       this.drawGraph(state.data, state.selectedState)
