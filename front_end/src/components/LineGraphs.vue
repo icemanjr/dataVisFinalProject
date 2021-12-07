@@ -26,7 +26,7 @@ import * as d3 from "d3";
 export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
-  margins = {"top": 20, "bottom": 50, "left": 50, "right": 20}
+  margins = {"top": 15, "bottom": 50, "left": 70, "right": 5}
 
   drawGraph(data, selectedState) {
     if (!data) return;
@@ -54,41 +54,35 @@ export default class LineGraphs extends Vue {
     const height = d3.select(".line-graphs").node().getBoundingClientRect().height;
     const graphWidth = width/4 - this.margins.left - this.margins.right;
     const graphHeight = height/3 - this.margins.top - this.margins.bottom;
+    
+    const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
+    const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
 
-    const validKeysBuy = Object.keys(buyAvg[0]).slice(188, 295)
-    const validKeysRent = Object.keys(rentAvg[0]).slice(188, 295)
-    console.log(validKeysBuy);
-    console.log(validKeysRent);
+    const validKeysBuy = Object.keys(buyAvg[0]).slice(188, 295);
+    const validKeysRent = Object.keys(rentAvg[0]).slice(188, 295);
+
     let maxBuy = 0;
     let maxRent = 0;
-    let minBuy = Infinity;
-    let minRent = Infinity;
-    let temp = 0;
+    let tempMax;
     for (let i=0; i<6; i++) {
-      temp = Math.max(Object.values(buy[i]).slice(175, 295));
-      if (maxBuy < temp) {
-        maxBuy = temp;
-      }
-      if (minBuy > temp) {
-        minBuy = temp;
+      tempMax = Object.values(buy[i]).slice(188, 295).map(Number).reduce(function(a,b){return Math.max(a,b)});
+      if (maxBuy < tempMax) {
+        maxBuy = tempMax;
       }
     }
     for (let i=0; i<6; i++) {
-      temp = Math.max(Object.values(rent[i]).slice(175, 297));
-      if (maxRent < temp) {
-        maxRent = temp;
-      }
-      if (minRent > temp) {
-        minRent = temp;
+      tempMax = Object.values(rent[i]).slice(188, 295).map(Number).reduce(function(a,b){return Math.max(a,b)})
+      if (maxRent < tempMax) {
+        maxRent = tempMax;
       }
     }
 
     function  getYValueBuy(key, idx) {
-      return parseFloat(buy[idx][0][key]);
+      return +buy[idx][key];
     }
 
     function getYValueRent(key, idx) {
-      return parseFloat(rent[idx][0][key]);
+      return +rent[idx][key];
     }
 
     const formatDate = key => {
@@ -135,8 +129,8 @@ export default class LineGraphs extends Vue {
     for (let i=0; i<6; i++) {
       let svgBuy = d3.select(`#line-graph-buy${i}`)
           .append("svg")
-          .attr("width", graphWidth)
-          .attr("height", graphHeight);
+          .attr("width", graphWidth + this.margins.left + this.margins.right)
+          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
 
       let gBuy = svgBuy.append("g")
           .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
@@ -146,7 +140,7 @@ export default class LineGraphs extends Vue {
 
       gBuy.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + graphHeight + ")")
         .call(xaxisBuy)
         .selectAll("text")
         .attr("y", 0)
@@ -160,7 +154,7 @@ export default class LineGraphs extends Vue {
         .call(yaxisBuy);
 
       gBuy.append('svg:path')
-        .attr("d", lineFuncBuy(validKeysBuy))
+        .attr("d", lineFuncBuy({key: validKeysBuy, idx: i}))
         .attr('stroke', 'black')
         .attr('stroke-width', 2)
         .attr('fill', 'none')
@@ -171,16 +165,16 @@ export default class LineGraphs extends Vue {
         });
 
       gBuy.append("text")
-        .attr("text-anchor", "end")
-        .attr("x", width)
+        .attr("text-anchor", "middle")
+        .attr("x", graphWidth/2)
         .attr("y", 0)
         .style("font-family", "calibri")
-        .text(data.RegionName);
+        .text(titlesBuy[i]);
 
       let svgRent = d3.selectAll(`#line-graph-rent${i}`)
           .append("svg")
-          .attr("width", graphWidth)
-          .attr("height", graphHeight);
+          .attr("width", graphWidth + this.margins.left + this.margins.right)
+          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
 
       let gRent = svgRent.append("g")
         .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
@@ -190,7 +184,7 @@ export default class LineGraphs extends Vue {
 
       gRent.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + graphHeight + ")")
         .call(xaxisRent)
         .selectAll("text")
         .attr("y", 0)
@@ -204,7 +198,7 @@ export default class LineGraphs extends Vue {
         .call(yaxisRent);
 
       gRent.append('svg:path')
-        .attr("d", lineFuncRent(validKeysRent))
+        .attr("d", lineFuncRent({key: validKeysRent, idx: i}))
         .attr('stroke', 'black')
         .attr('stroke-width', 2)
         .attr('fill', 'none')
@@ -215,11 +209,11 @@ export default class LineGraphs extends Vue {
         });
 
       gRent.append("text")
-        .attr("text-anchor", "end")
-        .attr("x", width)
+        .attr("text-anchor", "middle")
+        .attr("x", graphWidth/2)
         .attr("y", 0)
         .style("font-family", "calibri")
-        .text(data.RegionName);
+        .text(titlesRent[i]);
     }
   }
   
