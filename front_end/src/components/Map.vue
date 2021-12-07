@@ -20,6 +20,11 @@ export default class Map extends Vue {
 
   drawMap(data) {
     if (!data) return;
+    const colors = ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"];
+    const fill = d3.scaleQuantile().range(colors);
+    const getFillVal = d => parseFloat(d["2020-03-31"]) / parseFloat(d["2005-01-31"]) * 100;
+    fill.domain(d3.extent(data, d => getFillVal(d)));
+
     const svg = d3.select(".map")
       .append("svg")
       .attr("width", this.width)
@@ -40,18 +45,58 @@ export default class Map extends Vue {
         .attr("d", path)
         .style("stroke", "#000")
         .style("stroke-width", "1")
-        .style("fill", "#fff")
+        .style("fill", function(d,e) {
+          for (const state of data) {
+            if (state.RegionName === d.properties.name) {
+              return fill(getFillVal(state))
+            }
+          }
+          return "#f00";
+        })
         .on("mouseover", function(d,e) {
           d3.select(this)
             .style("fill", "#aaf")
         })
         .on("mouseout", function(d,e) {
           d3.select(this)
-            .style("fill", "#fff")
+            .style("fill", function(d,e) {
+              for (const state of data) {
+                if (state.RegionName === d.properties.name) return fill(getFillVal(state))
+              }
+            })
         })
         .on("click", (d,e) => {
           this.$store.commit("changeSelectedState", e.properties.name)
         })
+        const fillRange = [];
+        const legendWidth = 400;
+        const legendHeight = 20;
+        const legendExtend = d3.extent(data, d =>  getFillVal(d));
+        const min = legendExtend[0];
+        const max = legendExtend[1];
+
+        for(let i = 0;i <= colors.length;i++)
+        fillRange.push(legendWidth/colors.length * i);
+
+        let axisScale = d3.scaleQuantile().range(fillRange);
+
+        let diff = (max - min)/colors.length;
+        let LegendScale = [];
+        for(let i = 0;i <= colors.length;i++)
+        LegendScale.push(diff * (i + 1) + min);
+
+        axisScale.domain(LegendScale);
+
+
+        let legendaxis = d3.axisBottom(axisScale).tickFormat(x=>  x.toFixed(1) + "%");
+
+        let legend = svg.selectAll(".map").data(colors).enter().append("g").attr("transform", "translate(" + (600 / 2 - legendWidth / 2) + ", " + (this.height - legendHeight * 2 ) + ")")
+        legend.append("rect").attr("width", legendWidth/colors.length).attr("height", legendHeight).style("fill", d=>d)
+            .attr("x", (d,i)=> legendWidth/colors.length * i)
+
+        svg.append("g").attr("class", "axis")
+            .attr("transform", "translate(" + (600 / 2 - legendWidth/2) + ", " + (this.height - legendHeight) + ")")
+            .call(legendaxis);
     })
   }
 
