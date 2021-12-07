@@ -24,6 +24,7 @@ export default new Vuex.Store({
       const buy4 = st.data["four_bed"].filter(stateFilter);
       const buy5 = st.data["five_plus_bed"].filter(stateFilter);
       const buy = [buyAvg[0], buy1[0], buy2[0], buy3[0], buy4[0], buy5[0]];
+
       let maxBuy = 0;
       let tempMax;
       for (let i=0; i<6; i++) {
@@ -49,6 +50,9 @@ export default new Vuex.Store({
       let tempMax;
       let maxRent = 0;
       for (let i=0; i<6; i++) {
+        console.log(rent[i])
+        console.log(rent[i].slice(state.startIndex, state.endIndex))
+        console.log(rent[i].slice(state.startIndex, state.endIndex).map(Number))
         tempMax = Object.values(rent[i]).slice(state.startIndex, state.endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
         if (maxRent < tempMax) {
           maxRent = tempMax;

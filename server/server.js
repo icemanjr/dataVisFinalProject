@@ -34,7 +34,7 @@ app.get("/data", async (req, res) => {
      ]
      const results = {}
      for (const col of collections){
-          const collection = db.collection("all_homes");
+          const collection = db.collection(col);
           const result = await collection.find().toArray();
           results[col] = result
 

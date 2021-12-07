@@ -2,8 +2,15 @@
   <div class="home">
     <Map />
     <div class="lgs">
-      <LineGraphs :index="0" :category="'all_homes'" :maxValue="maxBuy"/>
-      <LineGraphs :index="1" :category="'all_homes_rental'" :maxValue="maxRent"/>
+      <LineGraphs
+        v-for="(param, i) in params"
+        :key="i"
+        :index="i"
+        :category="param.category"
+        :maxValue="param.maxValue"
+      />
+      <!-- <LineGraphs :index="0" :category="'all_homes'" :maxValue="maxBuy"/> -->
+      <!-- <LineGraphs :index="1" :category="'five_plus_bed_rental'" :maxValue="maxRent"/> -->
     </div>
   </div>
 </template>
@@ -28,6 +35,17 @@ export default class Home extends Vue {
     return this.$store.getters["getMaxRent"];
   }
 
+  params = [
+    {category: "all_homes", maxValue:this.maxBuy},
+    {category: "one_bed", maxValue: this.maxBuy},
+    {category: "two_bed", maxValue: this.maxBuy},
+    {category: "three_bed", maxValue: this.maxBuy},
+    {category: "four_bed", maxValue: this.maxBuy},
+    {category: "five_plus_bed", maxValue: this.maxBuy},
+  ]
+  mounted() {
+    console.log(this.params)
+  }
   getArray() {
     return new Array(50)
   }

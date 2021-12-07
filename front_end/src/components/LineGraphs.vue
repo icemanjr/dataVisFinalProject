@@ -1,5 +1,5 @@
 <template>
-    <div :id="`line-graph${index}`" class="line-graph">{{ index }}</div>
+    <div :id="`line-graph${index}`" class="line-graph"></div>
 </template>
 
 <script lang="ts">
@@ -25,6 +25,7 @@ export default class LineGraphs extends Vue {
       return dat.RegionName === selectedState;
     }
     const filtered_data = data[this.category].filter(d => stateFilter(d))[0]
+    const filtered_data_keys = Object.keys(filtered_data).slice(7, filtered_data.length)
 
 
     // const buyAvg = data["all_homes"].filter(stateFilter);
@@ -93,7 +94,6 @@ export default class LineGraphs extends Vue {
     const xScale = d3.scaleTime()
         .range([0, graphWidth])
         .domain(d3.extent(Object.keys(filtered_data), key => {
-          console.log(key)
           return formatDate(key)
         }));
 
@@ -103,7 +103,7 @@ export default class LineGraphs extends Vue {
 
 
 
-    const lineFuncBuy = d3.line()
+    const lineFunc = d3.line()
         .x(key => {
           return xScale(formatDate(key))
         })
@@ -131,9 +131,16 @@ export default class LineGraphs extends Vue {
       .attr("dy", ".35em")
       .attr("transform", "rotate(90)")
       .style("text-anchor", "start");
+
     g.append("g")
       .attr("class", "axis")
       .call(yAxis);
+
+    g.append('svg:path')
+      .attr("d", lineFunc(filtered_data_keys))
+      .attr('stroke', 'black')
+      .attr("stroke-width", 2)
+      .attr("fill", "none");
 
 //...
     // const buy0LineFunc = d3.line()
@@ -151,10 +158,6 @@ export default class LineGraphs extends Vue {
     //   })
 
     
-    // gBuy.append('svg:path')
-    //   .attr("d", buy0LineFunc(buy0Keys))
-    //   .attr('stroke', 'black')
-    //   .attr("stroke-width", 2)
 
 
     // for (let i=0; i<6; i++) {
