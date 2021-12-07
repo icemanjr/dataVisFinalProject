@@ -1,18 +1,5 @@
 <template>
-  <div class="line-graphs">
-    <div :id="`line-graph-buy0`"></div>
-    <div :id="`line-graph-rent0`"></div>
-    <div :id="`line-graph-buy1`"></div>
-    <div :id="`line-graph-rent1`"></div>
-    <div :id="`line-graph-buy2`"></div>
-    <div :id="`line-graph-rent2`"></div>
-    <div :id="`line-graph-buy3`"></div>
-    <div :id="`line-graph-rent3`"></div>
-    <div :id="`line-graph-buy4`"></div>
-    <div :id="`line-graph-rent4`"></div>
-    <div :id="`line-graph-buy5`"></div>
-    <div :id="`line-graph-rent5`"></div>
-  </div>
+    <div :id="`line-graph${index}`" class="line-graph">{{ index }}</div>
 </template>
 
 <script lang="ts">
@@ -51,10 +38,10 @@ export default class LineGraphs extends Vue {
     const rent5 = data["five_plus_bed_rental"].filter(stateFilter);
     const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
 
-    const width = d3.select(".line-graphs").node().getBoundingClientRect().width;
-    const height = d3.select(".line-graphs").node().getBoundingClientRect().height;
-    const graphWidth = width/4 - this.margins.left - this.margins.right;
-    const graphHeight = height/3 - this.margins.top - this.margins.bottom;
+    const width = d3.select (`#line-graph${this.index}`).node().getBoundingClientRect().width;
+    const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height;
+    const graphWidth = width/1.2 - this.margins.left - this.margins.right;
+    const graphHeight = height/1.2 - this.margins.top - this.margins.bottom;
     
     const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
     const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
@@ -130,95 +117,159 @@ export default class LineGraphs extends Vue {
           return yScaleRent(getYValueRent(key, idx))
         })
 
-    for (let i=0; i<6; i++) {
-      let svgBuy = d3.select(`#line-graph-buy${i}`)
-          .append("svg")
-          .attr("width", graphWidth + this.margins.left + this.margins.right)
-          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+    const svgBuy = d3.select(`#line-graph${this.index}`)
+      .append("svg")
+      .attr("width", graphWidth + this.margins.left + this.margins.right)
+      .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+    const gBuy = svgBuy.append("g")
+      .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
 
-      let gBuy = svgBuy.append("g")
-          .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+    const yAxisBuy = d3.axisLeft().scale(yScaleBuy).ticks(5);
+    const xAxisBuy = d3.axisBottom().scale(xScaleBuy);
+    gBuy.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + graphHeight + ")")
+      .call(xAxisBuy)
+      .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 9)
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(90)")
+      .style("text-anchor", "start");
+    gBuy.append("g")
+      .attr("class", "axis")
+      .call(yAxisBuy);
 
-      let yaxisBuy = d3.axisLeft().scale(yScaleBuy).ticks(5);
-      let xaxisBuy = d3.axisBottom().scale(xScaleBuy);
+    console.log(buy[0])
+    const buy0Keys = Object.keys(buy[0]).slice(7,200);
+    console.log(buy0Keys)
+    const getYValueBuy0 = key => buy[0][key];
+    const buy0LineFunc = d3.line()
+      .x(key => {
 
-      gBuy.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(0," + graphHeight + ")")
-        .call(xaxisBuy)
-        .selectAll("text")
-        .attr("y", 0)
-        .attr("x", 9)
-        .attr("dy", ".35em")
-        .attr("transform", "rotate(90)")
-        .style("text-anchor", "start");
+        console.log(xAxisBuy(formatDate(key)))
+        return 20
+      })
+      .y(key => {
+        return 30
+      })
+    // const buy0LineFunc = d3.line()
+    //   .x(key => {
+    //     console.log(xAxisBuy(formatDate(key)))
+    //     console.log(key, formatDate(key))
+    //     const r =  xAxisBuy(formatDate(key))
+    //     console.log(r)
+    //     return r
+    //   })
+    //   .y(key => {
+    //     console.log(key)
+    //     const r =  yAxisBuy(getYValueBuy0(key))
+    //     return r
+    //   })
 
-      gBuy.append("g")
-        .attr("class", "axis")
-        .call(yaxisBuy);
+    
+    // gBuy.append('svg:path')
+    //   .attr("d", buy0LineFunc(buy0Keys))
+    //   .attr('stroke', 'black')
+    //   .attr("stroke-width", 2)
 
-      gBuy.append('svg:path')
-        .attr("d", lineFuncBuy({key: validKeysBuy, idx: i}))
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2)
-        .attr('fill', 'none')
-        .attr("id", "line")
-        .style("z-index", "0")
-        .on("mouseover", function (d, e) {
-          console.log(this, d, e)
-        });
 
-      gBuy.append("text")
-        .attr("text-anchor", "middle")
-        .attr("x", graphWidth/2)
-        .attr("y", 0)
-        .style("font-family", "calibri")
-        .text(titlesBuy[i]);
+    // for (let i=0; i<6; i++) {
+    //   let svgBuy = d3.select(`#line-graph-buy${i}`)
+    //       .append("svg")
+    //       .attr("width", graphWidth + this.margins.left + this.margins.right)
+    //       .attr("height", graphHeight + this.margins.top + this.margins.bottom);
 
-      let svgRent = d3.selectAll(`#line-graph-rent${i}`)
-          .append("svg")
-          .attr("width", graphWidth + this.margins.left + this.margins.right)
-          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+    //   let gBuy = svgBuy.append("g")
+    //       .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
 
-      let gRent = svgRent.append("g")
-        .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+    //   let yaxisBuy = d3.axisLeft().scale(yScaleBuy).ticks(5);
+    //   let xaxisBuy = d3.axisBottom().scale(xScaleBuy);
 
-      let yaxisRent = d3.axisLeft().scale(yScaleRent).ticks(5);
-      let xaxisRent = d3.axisBottom().scale(xScaleRent);
+    //   gBuy.append("g")
+    //     .attr("class", "axis")
+    //     .attr("transform", "translate(0," + graphHeight + ")")
+    //     .call(xaxisBuy)
+    //     .selectAll("text")
+    //     .attr("y", 0)
+    //     .attr("x", 9)
+    //     .attr("dy", ".35em")
+    //     .attr("transform", "rotate(90)")
+    //     .style("text-anchor", "start");
 
-      gRent.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(0," + graphHeight + ")")
-        .call(xaxisRent)
-        .selectAll("text")
-        .attr("y", 0)
-        .attr("x", 9)
-        .attr("dy", ".35em")
-        .attr("transform", "rotate(90)")
-        .style("text-anchor", "start");
+    //   gBuy.append("g")
+    //     .attr("class", "axis")
+    //     .call(yaxisBuy);
 
-      gRent.append("g")
-        .attr("class", "axis")
-        .call(yaxisRent);
+    //   console.log(buy[i])
 
-      gRent.append('svg:path')
-        .attr("d", lineFuncRent({key: validKeysRent, idx: i}))
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2)
-        .attr('fill', 'none')
-        .attr("id", "line")
-        .style("z-index", "0")
-        .on("mouseover", function (d, e) {
-          console.log(this, d, e)
-        });
+    //   gBuy.append('svg:path')
+    //     .data(buy[i])
+    //     // .attr("d", lineFuncBuy({key: validKeysBuy, idx: i}))
+    //     .attr("d", d => {
+    //       console.log(d)
+    //       return 10
+    //     })
+    //     .attr('stroke', 'black')
+    //     .attr('stroke-width', 2)
+    //     .attr('fill', 'none')
+    //     .attr("id", "line")
+    //     .style("z-index", "0")
+    //     .on("mouseover", function (d, e) {
+    //       console.log(this, d, e)
+    //     });
 
-      gRent.append("text")
-        .attr("text-anchor", "middle")
-        .attr("x", graphWidth/2)
-        .attr("y", 0)
-        .style("font-family", "calibri")
-        .text(titlesRent[i]);
-    }
+    //   gBuy.append("text")
+    //     .attr("text-anchor", "middle")
+    //     .attr("x", graphWidth/2)
+    //     .attr("y", 0)
+    //     .style("font-family", "calibri")
+    //     .text(`${selectedState} ${titlesBuy[i]}`);
+
+    //   let svgRent = d3.selectAll(`#line-graph-rent${i}`)
+    //       .append("svg")
+    //       .attr("width", graphWidth + this.margins.left + this.margins.right)
+    //       .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+
+    //   let gRent = svgRent.append("g")
+    //     .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+
+    //   let yaxisRent = d3.axisLeft().scale(yScaleRent).ticks(5);
+    //   let xaxisRent = d3.axisBottom().scale(xScaleRent);
+
+    //   gRent.append("g")
+    //     .attr("class", "axis")
+    //     .attr("transform", "translate(0," + graphHeight + ")")
+    //     .call(xaxisRent)
+    //     .selectAll("text")
+    //     .attr("y", 0)
+    //     .attr("x", 9)
+    //     .attr("dy", ".35em")
+    //     .attr("transform", "rotate(90)")
+    //     .style("text-anchor", "start");
+
+    //   gRent.append("g")
+    //     .attr("class", "axis")
+    //     .call(yaxisRent);
+
+    //   gRent.append('svg:path')
+    //     .attr("d", lineFuncRent({key: validKeysRent, idx: i}))
+    //     .attr('stroke', 'black')
+    //     .attr('stroke-width', 2)
+    //     .attr('fill', 'none')
+    //     .attr("id", "line")
+    //     .style("z-index", "0")
+    //     .on("mouseover", function (d, e) {
+    //       console.log(this, d, e)
+    //     });
+
+    //   gRent.append("text")
+    //     .attr("text-anchor", "middle")
+    //     .attr("x", graphWidth/2)
+    //     .attr("y", 0)
+    //     .style("font-family", "calibri")
+    //     .text(`${selectedState} ${titlesRent[i]}`);
+    // }
   }
   
   mounted() {
@@ -234,7 +285,7 @@ export default class LineGraphs extends Vue {
 
 <style lang="scss">
 @import "@/assets/css/styles.scss";
-.line-graphs {
+.line-graph {
   @include component;
 }
 .axis path{

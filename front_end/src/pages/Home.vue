@@ -1,7 +1,20 @@
 <template>
   <div class="home">
     <Map />
-    <LineGraphs />
+    <div class="lgs">
+    <LineGraphs :index="0" />
+    <!-- <LineGraphs :index="1" />
+    <LineGraphs :index="2" />
+    <LineGraphs :index="3" />
+    <LineGraphs :index="4" />
+    <LineGraphs :index="5" />
+    <LineGraphs :index="6" />
+    <LineGraphs :index="7" />
+    <LineGraphs :index="8" />
+    <LineGraphs :index="9" />
+    <LineGraphs :index="10" />
+    <LineGraphs :index="11" /> -->
+    </div>
   </div>
 </template>
 
@@ -18,6 +31,7 @@ import LineGraphs from "@/components/LineGraphs.vue";
   },
 })
 export default class Home extends Vue {
+
   getArray() {
     return new Array(50)
   }
@@ -30,9 +44,12 @@ export default class Home extends Vue {
   display: grid;
   grid-template-rows: 50% auto; 
 }
-.line-graphs {
+.lgs {
+  height: 900px;
   display: grid;
   width: 100%;
-  grid-template-columns: 25% 25% 25% 25%;
+  // grid-template-columns: 25% 25% 25% 25%;
+  grid-template-columns: 33% 33% 33% ;
+  grid-template-rows: 200px 200px 200px;
 }
 </style>
