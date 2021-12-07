@@ -12,6 +12,8 @@ import * as d3 from "d3";
 })
 export default class LineGraphs extends Vue {
   @Prop() index!: number;
+  @Prop() maxValue!: Function;
+  @Prop() category!: string;
   data = () => this.$store.state.data
   margins = {"top": 15, "bottom": 50, "left": 70, "right": 5}
   unwatch = null;
@@ -22,137 +24,118 @@ export default class LineGraphs extends Vue {
     function stateFilter(dat){
       return dat.RegionName === selectedState;
     }
-    const buyAvg = data["all_homes"].filter(stateFilter);
-    const buy1 = data["one_bed"].filter(stateFilter);
-    const buy2 = data["two_bed"].filter(stateFilter);
-    const buy3 = data["three_bed"].filter(stateFilter);
-    const buy4 = data["four_bed"].filter(stateFilter);
-    const buy5 = data["five_plus_bed"].filter(stateFilter);
-    const buy = [buyAvg[0], buy1[0], buy2[0], buy3[0], buy4[0], buy5[0]];
+    const filtered_data = data[this.category].filter(d => stateFilter(d))[0]
 
-    const rentAvg = data["all_homes_rental"].filter(stateFilter);
-    const rent1 = data["one_bed_rental"].filter(stateFilter);
-    const rent2 = data["two_bed_rental"].filter(stateFilter);
-    const rent3 = data["three_bed_rental"].filter(stateFilter);
-    const rent4 = data["four_bed_rental"].filter(stateFilter);
-    const rent5 = data["five_plus_bed_rental"].filter(stateFilter);
-    const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
+
+    // const buyAvg = data["all_homes"].filter(stateFilter);
+    // const buy1 = data["one_bed"].filter(stateFilter);
+    // const buy2 = data["two_bed"].filter(stateFilter);
+    // const buy3 = data["three_bed"].filter(stateFilter);
+    // const buy4 = data["four_bed"].filter(stateFilter);
+    // const buy5 = data["five_plus_bed"].filter(stateFilter);
+    // const buy = [buyAvg[0], buy1[0], buy2[0], buy3[0], buy4[0], buy5[0]];
+
+    // const rentAvg = data["all_homes_rental"].filter(stateFilter);
+    // const rent1 = data["one_bed_rental"].filter(stateFilter);
+    // const rent2 = data["two_bed_rental"].filter(stateFilter);
+    // const rent3 = data["three_bed_rental"].filter(stateFilter);
+    // const rent4 = data["four_bed_rental"].filter(stateFilter);
+    // const rent5 = data["five_plus_bed_rental"].filter(stateFilter);
+    // const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
 
     const width = d3.select (`#line-graph${this.index}`).node().getBoundingClientRect().width;
     const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height;
     const graphWidth = width/1.2 - this.margins.left - this.margins.right;
     const graphHeight = height/1.2 - this.margins.top - this.margins.bottom;
     
-    const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
-    const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
+    // const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
+    // const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
 
     const startIndex = 188;
     const endIndex = 295;
 
-    const validKeysBuy = Object.keys(buyAvg[0]).slice(startIndex, endIndex);
-    const validKeysRent = Object.keys(rentAvg[0]).slice(startIndex, endIndex);
+    // const validKeysBuy = Object.keys(buyAvg[0]).slice(startIndex, endIndex);
+    // const validKeysRent = Object.keys(rentAvg[0]).slice(startIndex, endIndex);
 
-    let maxBuy = 0;
-    let maxRent = 0;
-    let tempMax;
-    for (let i=0; i<6; i++) {
-      tempMax = Object.values(buy[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)});
-      if (maxBuy < tempMax) {
-        maxBuy = tempMax;
-      }
-    }
-    for (let i=0; i<6; i++) {
-      tempMax = Object.values(rent[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
-      if (maxRent < tempMax) {
-        maxRent = tempMax;
-      }
-    }
+    // let maxBuy = 0;
+    // let maxRent = 0;
+    // let tempMax;
+    // for (let i=0; i<6; i++) {
+    //   tempMax = Object.values(buy[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)});
+    //   if (maxBuy < tempMax) {
+    //     maxBuy = tempMax;
+    //   }
+    // }
+    // for (let i=0; i<6; i++) {
+    //   tempMax = Object.values(rent[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
+    //   if (maxRent < tempMax) {
+    //     maxRent = tempMax;
+    //   }
+    // }
 
-    function  getYValueBuy(key, idx) {
-      return +buy[idx][key];
-    }
+    // function  getYValueBuy(key, idx) {
+    //   return +buy[idx][key];
+    // }
 
-    function getYValueRent(key, idx) {
-      return +rent[idx][key];
-    }
+    // function getYValueRent(key, idx) {
+    //   return +rent[idx][key];
+    // }
+
+    const getYValue = (key) => filtered_data[key];
 
     const formatDate = key => {
       const splitDate = key.split("-")
       return new Date(splitDate[0], splitDate[1] - 1, splitDate[2])
     }
 
-    const xScaleBuy = d3.scaleTime()
+    //...
+
+    const xScale = d3.scaleTime()
         .range([0, graphWidth])
-        .domain(d3.extent(validKeysBuy, key => {
+        .domain(d3.extent(Object.keys(filtered_data), key => {
+          console.log(key)
           return formatDate(key)
         }));
 
-    const yScaleBuy = d3.scaleLinear()
+    const yScale = d3.scaleLinear()
         .range([graphHeight, 0])
-        .domain([0, maxBuy]);
+        .domain([0, this.maxValue()]);
 
-    const xScaleRent = d3.scaleTime()
-        .range([0, graphWidth])
-        .domain(d3.extent(validKeysBuy, key => {
-          return formatDate(key)
-        }));
 
-    const yScaleRent = d3.scaleLinear()
-        .range([graphHeight, 0])
-        .domain([0, maxRent]);
 
     const lineFuncBuy = d3.line()
         .x(key => {
-          return xScaleBuy(formatDate(key))
+          return xScale(formatDate(key))
         })
-        .y((key, idx) => {
-          return yScaleBuy(getYValueBuy(key, idx))
-        })
+        .y((key) => {
+          return yScale(getYValue(key))
+        });
 
-    const lineFuncRent = d3.line()
-        .x(key => {
-          return xScaleRent(formatDate(key))
-        })
-        .y((key, idx) => {
-          return yScaleRent(getYValueRent(key, idx))
-        })
 
-    const svgBuy = d3.select(`#line-graph${this.index}`)
+    const svg = d3.select(`#line-graph${this.index}`)
       .append("svg")
       .attr("width", graphWidth + this.margins.left + this.margins.right)
       .attr("height", graphHeight + this.margins.top + this.margins.bottom);
-    const gBuy = svgBuy.append("g")
+    const g = svg.append("g")
       .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
 
-    const yAxisBuy = d3.axisLeft().scale(yScaleBuy).ticks(5);
-    const xAxisBuy = d3.axisBottom().scale(xScaleBuy);
-    gBuy.append("g")
+    const yAxis = d3.axisLeft().scale(yScale).ticks(5);
+    const xAxis = d3.axisBottom().scale(xScale);
+    g.append("g")
       .attr("class", "axis")
       .attr("transform", "translate(0," + graphHeight + ")")
-      .call(xAxisBuy)
+      .call(xAxis)
       .selectAll("text")
       .attr("y", 0)
       .attr("x", 9)
       .attr("dy", ".35em")
       .attr("transform", "rotate(90)")
       .style("text-anchor", "start");
-    gBuy.append("g")
+    g.append("g")
       .attr("class", "axis")
-      .call(yAxisBuy);
+      .call(yAxis);
 
-    console.log(buy[0])
-    const buy0Keys = Object.keys(buy[0]).slice(7,200);
-    console.log(buy0Keys)
-    const getYValueBuy0 = key => buy[0][key];
-    const buy0LineFunc = d3.line()
-      .x(key => {
-
-        console.log(xAxisBuy(formatDate(key)))
-        return 20
-      })
-      .y(key => {
-        return 30
-      })
+//...
     // const buy0LineFunc = d3.line()
     //   .x(key => {
     //     console.log(xAxisBuy(formatDate(key)))

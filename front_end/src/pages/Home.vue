@@ -2,18 +2,8 @@
   <div class="home">
     <Map />
     <div class="lgs">
-    <LineGraphs :index="0" />
-    <!-- <LineGraphs :index="1" />
-    <LineGraphs :index="2" />
-    <LineGraphs :index="3" />
-    <LineGraphs :index="4" />
-    <LineGraphs :index="5" />
-    <LineGraphs :index="6" />
-    <LineGraphs :index="7" />
-    <LineGraphs :index="8" />
-    <LineGraphs :index="9" />
-    <LineGraphs :index="10" />
-    <LineGraphs :index="11" /> -->
+      <LineGraphs :index="0" :category="'all_homes'" :maxValue="maxBuy"/>
+      <LineGraphs :index="1" :category="'all_homes_rental'" :maxValue="maxRent"/>
     </div>
   </div>
 </template>
@@ -31,6 +21,12 @@ import LineGraphs from "@/components/LineGraphs.vue";
   },
 })
 export default class Home extends Vue {
+  maxBuy() {
+    return this.$store.getters["getMaxBuy"];
+  }
+  maxRent() {
+    return this.$store.getters["getMaxRent"];
+  }
 
   getArray() {
     return new Array(50)
