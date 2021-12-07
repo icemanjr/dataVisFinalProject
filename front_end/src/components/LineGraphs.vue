@@ -1,5 +1,18 @@
 <template>
-    <div :id="`line-graph${index}`"></div>
+  <div class="line-graphs">
+    <div :id="`line-graph-buy0`"></div>
+    <div :id="`line-graph-rent0`"></div>
+    <div :id="`line-graph-buy1`"></div>
+    <div :id="`line-graph-rent1`"></div>
+    <div :id="`line-graph-buy2`"></div>
+    <div :id="`line-graph-rent2`"></div>
+    <div :id="`line-graph-buy3`"></div>
+    <div :id="`line-graph-rent3`"></div>
+    <div :id="`line-graph-buy4`"></div>
+    <div :id="`line-graph-rent4`"></div>
+    <div :id="`line-graph-buy5`"></div>
+    <div :id="`line-graph-rent5`"></div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -13,7 +26,8 @@ import * as d3 from "d3";
 export default class LineGraphs extends Vue {
   @Prop() index!: number;
   data = () => this.$store.state.data
-  margins = {"top": 20, "bottom": 50, "left": 50, "right": 20}
+  margins = {"top": 15, "bottom": 50, "left": 70, "right": 5}
+  unwatch = null;
 
   drawGraph(data, selectedState) {
     if (!data) return;
@@ -27,6 +41,7 @@ export default class LineGraphs extends Vue {
     const buy3 = data["three_bed"].filter(stateFilter);
     const buy4 = data["four_bed"].filter(stateFilter);
     const buy5 = data["five_plus_bed"].filter(stateFilter);
+    const buy = [buyAvg[0], buy1[0], buy2[0], buy3[0], buy4[0], buy5[0]];
 
     const rentAvg = data["all_homes_rental"].filter(stateFilter);
     const rent1 = data["one_bed_rental"].filter(stateFilter);
@@ -34,114 +49,185 @@ export default class LineGraphs extends Vue {
     const rent3 = data["three_bed_rental"].filter(stateFilter);
     const rent4 = data["four_bed_rental"].filter(stateFilter);
     const rent5 = data["five_plus_bed_rental"].filter(stateFilter);
+    const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
 
     const width = d3.select(".line-graphs").node().getBoundingClientRect().width;
     const height = d3.select(".line-graphs").node().getBoundingClientRect().height;
     const graphWidth = width/4 - this.margins.left - this.margins.right;
     const graphHeight = height/3 - this.margins.top - this.margins.bottom;
+    
+    const titlesBuy = ["Buy Average", "Buy 1 Bedroom", "Buy 2 Bedroom", "Buy 3 Bedroom", "Buy 4 Bedroom", "Buy 5+ Bedroom"]
+    const titlesRent = ["Rent Average", "Rent 1 Bedroom", "Rent 2 Bedroom", "Rent 3 Bedroom", "Rent 4 Bedroom", "Rent 5+ Bedroom"]
 
-    const validKeys = Object.keys(buyAvg).slice(170, 300)
-    console.log(validKeys);
+    const startIndex = 188;
+    const endIndex = 295;
 
+    const validKeysBuy = Object.keys(buyAvg[0]).slice(startIndex, endIndex);
+    const validKeysRent = Object.keys(rentAvg[0]).slice(startIndex, endIndex);
+
+    let maxBuy = 0;
+    let maxRent = 0;
+    let tempMax;
+    for (let i=0; i<6; i++) {
+      tempMax = Object.values(buy[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)});
+      if (maxBuy < tempMax) {
+        maxBuy = tempMax;
+      }
+    }
+    for (let i=0; i<6; i++) {
+      tempMax = Object.values(rent[i]).slice(startIndex, endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
+      if (maxRent < tempMax) {
+        maxRent = tempMax;
+      }
+    }
+
+    function  getYValueBuy(key, idx) {
+      return +buy[idx][key];
+    }
+
+    function getYValueRent(key, idx) {
+      return +rent[idx][key];
+    }
 
     const formatDate = key => {
       const splitDate = key.split("-")
       return new Date(splitDate[0], splitDate[1] - 1, splitDate[2])
     }
-    const getYValue = key => parseFloat(data[key])
 
     const xScaleBuy = d3.scaleTime()
-        .range([0, width])
-        .domain(d3.extent(validKeys, key => {
+        .range([0, graphWidth])
+        .domain(d3.extent(validKeysBuy, key => {
           return formatDate(key)
         }));
 
     const yScaleBuy = d3.scaleLinear()
-        .range([height, 0])
-        .domain([0, d3.max(validKeys, key => {
-          return getYValue(key)
-        })]);
+        .range([graphHeight, 0])
+        .domain([0, maxBuy]);
 
     const xScaleRent = d3.scaleTime()
-        .range([0, width])
-        .domain(d3.extent(validKeys, key => {
+        .range([0, graphWidth])
+        .domain(d3.extent(validKeysBuy, key => {
           return formatDate(key)
         }));
 
     const yScaleRent = d3.scaleLinear()
-        .range([height, 0])
-        .domain([0, d3.max(validKeys, key => {
-          return getYValue(key)
-        })]);
+        .range([graphHeight, 0])
+        .domain([0, maxRent]);
 
     const lineFuncBuy = d3.line()
         .x(key => {
           return xScaleBuy(formatDate(key))
         })
-        .y(key => {
-          return yScaleBuy(getYValue(key))
+        .y((key, idx) => {
+          return yScaleBuy(getYValueBuy(key, idx))
         })
 
     const lineFuncRent = d3.line()
         .x(key => {
           return xScaleRent(formatDate(key))
         })
-        .y(key => {
-          return yScaleRent(getYValue(key))
+        .y((key, idx) => {
+          return yScaleRent(getYValueRent(key, idx))
         })
 
     for (let i=0; i<6; i++) {
-      const svg = d3.select(`.line-graph`)
+      let svgBuy = d3.select(`#line-graph-buy${i}`)
           .append("svg")
-          .attr("width", graphWidth)
-          .attr("height", graphHeight);
+          .attr("width", graphWidth + this.margins.left + this.margins.right)
+          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
 
-      const g = svg.append("g")
+      let gBuy = svgBuy.append("g")
           .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
 
-      const yaxis = d3.axisLeft().scale(yScaleBuy).ticks(5);
-      const xaxis = d3.axisBottom().scale(xScaleBuy);
+      let yaxisBuy = d3.axisLeft().scale(yScaleBuy).ticks(5);
+      let xaxisBuy = d3.axisBottom().scale(xScaleBuy);
 
-      g.append("g")
-          .attr("class", "axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xaxis)
-          .selectAll("text")
-          .attr("y", 0)
-          .attr("x", 9)
-          .attr("dy", ".35em")
-          .attr("transform", "rotate(90)")
-          .style("text-anchor", "start");
+      gBuy.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + graphHeight + ")")
+        .call(xaxisBuy)
+        .selectAll("text")
+        .attr("y", 0)
+        .attr("x", 9)
+        .attr("dy", ".35em")
+        .attr("transform", "rotate(90)")
+        .style("text-anchor", "start");
 
-      g.append("g")
-          .attr("class", "axis")
-          .call(yaxis);
+      gBuy.append("g")
+        .attr("class", "axis")
+        .call(yaxisBuy);
 
-      g.append('svg:path')
-          .attr("d", lineFuncBuy(validKeys))
-          .attr('stroke', 'black')
-          .attr('stroke-width', 2)
-          .attr('fill', 'none')
-          .attr("id", "line")
-          .style("z-index", "0")
-          .on("mouseover", function (d, e) {
-            console.log(this, d, e)
-          });
+      gBuy.append('svg:path')
+        .attr("d", lineFuncBuy({key: validKeysBuy, idx: i}))
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none')
+        .attr("id", "line")
+        .style("z-index", "0")
+        .on("mouseover", function (d, e) {
+          console.log(this, d, e)
+        });
 
-      g.append("text")
-          .attr("text-anchor", "end")
-          .attr("x", width)
-          .attr("y", 0)
-          .style("font-family", "calibri")
-          .text(data.RegionName);
+      gBuy.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", graphWidth/2)
+        .attr("y", 0)
+        .style("font-family", "calibri")
+        .text(titlesBuy[i]);
+
+      let svgRent = d3.selectAll(`#line-graph-rent${i}`)
+          .append("svg")
+          .attr("width", graphWidth + this.margins.left + this.margins.right)
+          .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+
+      let gRent = svgRent.append("g")
+        .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
+
+      let yaxisRent = d3.axisLeft().scale(yScaleRent).ticks(5);
+      let xaxisRent = d3.axisBottom().scale(xScaleRent);
+
+      gRent.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + graphHeight + ")")
+        .call(xaxisRent)
+        .selectAll("text")
+        .attr("y", 0)
+        .attr("x", 9)
+        .attr("dy", ".35em")
+        .attr("transform", "rotate(90)")
+        .style("text-anchor", "start");
+
+      gRent.append("g")
+        .attr("class", "axis")
+        .call(yaxisRent);
+
+      gRent.append('svg:path')
+        .attr("d", lineFuncRent({key: validKeysRent, idx: i}))
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none')
+        .attr("id", "line")
+        .style("z-index", "0")
+        .on("mouseover", function (d, e) {
+          console.log(this, d, e)
+        });
+
+      gRent.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", graphWidth/2)
+        .attr("y", 0)
+        .style("font-family", "calibri")
+        .text(titlesRent[i]);
     }
   }
   
   mounted() {
-    this.$store.watch((state) =>{
+    const unwatch = this.$store.watch((state) =>{
       if (!state.data) return;
-     return this.drawGraph(state.data, state.selectedState)
+      this.drawGraph(state.data, state.selectedState)
+      this.unwatch()
     })
+    this.unwatch = unwatch
   }
 }
 </script>

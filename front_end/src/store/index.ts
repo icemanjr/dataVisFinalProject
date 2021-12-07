@@ -7,7 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     data: null,
-    selectedState: null
+    selectedState: "Utah"
   },
   mutations: {
     init: async (state) => {
