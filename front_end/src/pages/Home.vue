@@ -36,13 +36,18 @@ export default class Home extends Vue {
 
 
   params = [
-    {category: "all_homes", maxValue:this.maxBuy, title:"All Homes"},
-    {category: "one_bed", maxValue: this.maxBuy, title:"One Bed"},
-    {category: "two_bed", maxValue: this.maxBuy, title:"Two Beds"},
-    {category: "three_bed", maxValue: this.maxBuy, title:"Three Beds"},
-    {category: "four_bed", maxValue: this.maxBuy, title: "Four Beds"},
-    {category: "five_plus_bed", maxValue: this.maxBuy, title: "Five+ Beds"},
-    {category: "all_homes_rental", maxValue: this.maxRent, title: "All Homes Rental"},
+    {category: "all_homes", maxValue:this.maxBuy, title:"Buy Average"},
+    {category: "all_homes_rental", maxValue: this.maxRent, title: "Rent Average"},
+    {category: "one_bed", maxValue: this.maxBuy, title:"Buy One Bed"},
+    {category: "one_bed_rental", maxValue: this.maxRent, title:"Rent One Bed"},
+    {category: "two_bed", maxValue: this.maxBuy, title:"Buy Two Beds"},
+    {category: "two_bed_rental", maxValue: this.maxRent, title:"Rent Two Beds"},
+    {category: "three_bed", maxValue: this.maxBuy, title:"Buy Three Beds"},
+    {category: "three_bed_rental", maxValue: this.maxRent, title:"Rent Three Beds"},
+    {category: "four_bed", maxValue: this.maxBuy, title: "Buy Four Beds"},
+    {category: "four_bed_rental", maxValue: this.maxRent, title: "Rent Four Beds"},
+    {category: "five_plus_bed", maxValue: this.maxBuy, title: "Buy Five+ Beds"},
+    {category: "five_plus_bed_rental", maxValue: this.maxRent, title: "Rent Five+ Beds"},
   ]
   mounted() {
     console.log(this.params)

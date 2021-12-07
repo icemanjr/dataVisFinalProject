@@ -8,9 +8,10 @@ const getMaxFromData = (dataArray)  => {
       console.log(dataArray)
       let maxVal = 0;
       for (const category of dataArray) {
-        const t = new Date()
-        for (const val of Object.values(category.data)) {
-          maxVal = Math.max(maxVal, +val)
+        if (category !== undefined) {
+          for (const val of Object.values(category.data)) {
+            maxVal = Math.max(maxVal, +val)
+          }
         }
       }
       return maxVal

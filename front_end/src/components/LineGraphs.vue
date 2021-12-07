@@ -1,5 +1,5 @@
 <template>
-    <div :id="`line-graph${index}`" class="line-graph">{{title}}</div>
+    <div :id="`line-graph${index}`" class="line-graph"></div>
 </template>
 
 <script lang="ts">
@@ -27,10 +27,8 @@ export default class LineGraphs extends Vue {
     }
     const filtered_data = data[this.category].filter(d => stateFilter(d))[0].data;
     const filtered_data_keys = Object.keys(filtered_data)
-    const width = d3.select (`#line-graph${this.index}`).node().getBoundingClientRect().width;
-    const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height;
-    const graphWidth = width/1.2 - this.margins.left - this.margins.right;
-    const graphHeight = height/1.2 - this.margins.top - this.margins.bottom;
+    const width = d3.select (`#line-graph${this.index}`).node().getBoundingClientRect().width - this.margins.left - this.margins.right;
+    const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height - this.margins.top - this.margins.bottom;
     const getYValue = (key) => filtered_data[key];
 
     const formatDate = key => {
@@ -38,13 +36,13 @@ export default class LineGraphs extends Vue {
       return new Date(splitDate[0], splitDate[1] - 1)
     }
     const xScale = d3.scaleTime()
-        .range([0, graphWidth])
+        .range([0, width])
         .domain(d3.extent(Object.keys(filtered_data), key => {
           return formatDate(key)
         }));
 
     const yScale = d3.scaleLinear()
-        .range([graphHeight, 0])
+        .range([height, 0])
         .domain([0, this.maxValue()]);
     const lineFunc = d3.line()
         .x(key => {
@@ -55,8 +53,15 @@ export default class LineGraphs extends Vue {
         });
     const svg = d3.select(`#line-graph${this.index}`)
       .append("svg")
-      .attr("width", graphWidth + this.margins.left + this.margins.right)
-      .attr("height", graphHeight + this.margins.top + this.margins.bottom);
+      .attr("width", width + this.margins.left + this.margins.right)
+      .attr("height", height + this.margins.top + this.margins.bottom);
+
+    svg.append("text")
+        .text(`${this.title}`)
+        .attr("class", "title")
+        .attr("x", (this.margins.left + width/2))
+        .attr("y", 15);
+
     const g = svg.append("g")
       .attr("transform", "translate(" + this.margins.left + "," + this.margins.top + ")");
 
@@ -64,7 +69,7 @@ export default class LineGraphs extends Vue {
     const xAxis = d3.axisBottom().scale(xScale);
     g.append("g")
       .attr("class", "axis")
-      .attr("transform", "translate(0," + graphHeight + ")")
+      .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
       .selectAll("text")
       .attr("y", 0)
@@ -75,23 +80,86 @@ export default class LineGraphs extends Vue {
 
     g.append("g")
       .attr("class", "axis")
+      .attr("id", `axis${this.index}`)
       .call(yAxis);
 
     g.append('svg:path')
+      .attr("id", `path${this.index}`)
       .attr("d", lineFunc(filtered_data_keys))
       .attr('stroke', 'black')
       .attr("stroke-width", 2)
       .attr("fill", "none");
   }
-  updateGraph(state) {
+  updateGraph(data, selectedState) {
     console.log('updating graph')
+
+    function stateFilter(dat) {
+      return dat.state === selectedState;
+    }
+
+    const width = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().width - this.margins.left - this.margins.right;
+    const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height - this.margins.top - this.margins.bottom;
+
+    const new_data = data.data[this.category].filter(d => stateFilter(d))[0];
+    if (new_data?.data) {
+      console.log(new_data)
+      const filtered_data = new_data.data;
+      const filtered_data_keys = Object.keys(filtered_data)
+      const getYValue = (key) => filtered_data[key];
+
+      const formatDate = key => {
+        const splitDate = key.split("-")
+        return new Date(splitDate[0], splitDate[1] - 1)
+      }
+      const xScale = d3.scaleTime()
+          .range([0, width])
+          .domain(d3.extent(Object.keys(filtered_data), key => {
+            return formatDate(key)
+          }));
+
+      const yScale = d3.scaleLinear()
+          .range([height, 0])
+          .domain([0, this.maxValue()]);
+      const lineFunc = d3.line()
+          .x(key => {
+            return xScale(formatDate(key))
+          })
+          .y((key) => {
+            return yScale(getYValue(key))
+          });
+
+      const yAxis = d3.axisLeft().scale(yScale).ticks(5);
+      d3.select(`#axis${this.index}`)
+          .call(yAxis);
+
+      d3.select(`#path${this.index}`)
+          .attr("d", lineFunc(filtered_data_keys))
+          .attr('stroke', 'black')
+          .attr("stroke-width", 2)
+          .attr("fill", "none");
+    } else {
+      const yScale = d3.scaleLinear()
+          .range([height, 0])
+          .domain([0, this.maxValue()]);
+
+      const yAxis = d3.axisLeft().scale(yScale).ticks(5);
+
+      d3.select(`#axis${this.index}`)
+          .call(yAxis);
+
+      d3.select(`#path${this.index}`)
+          .attr("d", "M 0 " + height + " L " + width + " " + height)
+          .attr('stroke', 'black')
+          .attr("stroke-width", 2)
+          .attr("fill", "none");
+    }
   }
   
   mounted() {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
-      console.log(mutation,state)
+      // console.log(mutation,state)
       if (mutation.type === "changeSelectedState") {
-        this.updateGraph(state)
+        this.updateGraph(state, state.selectedState)
       }
 
     })
@@ -135,4 +203,12 @@ export default class LineGraphs extends Vue {
     font-weight: normal;
   }
 }
+.title {
+  fill:  black;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  text-anchor: middle;
+}
+
 </style>
