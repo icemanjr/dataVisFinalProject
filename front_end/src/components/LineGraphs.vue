@@ -15,12 +15,11 @@ export default class LineGraphs extends Vue {
   data = () => this.$store.state.data
   margins = {"top": 20, "bottom": 50, "left": 50, "right": 20}
 
-  drawGraph(data) {
+  drawGraph(data, selectedState) {
     if (!data) return;
-    if (!this.$store.state.selectedState) return;
 
     function stateFilter(dat){
-      return dat.RegionName === this.$store.state.selectedState;
+      return dat.RegionName === selectedState;
     }
     const buyAvg = data["all_homes"].filter(stateFilter);
     const buy1 = data["one_bed"].filter(stateFilter);
@@ -141,7 +140,7 @@ export default class LineGraphs extends Vue {
   mounted() {
     this.$store.watch((state) =>{
       if (!state.data) return;
-     return this.drawGraph(state.data)
+     return this.drawGraph(state.data, state.selectedState)
     })
   }
 }
