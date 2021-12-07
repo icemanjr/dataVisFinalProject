@@ -51,18 +51,6 @@ export default new Vuex.Store({
       const rent5 = st.data["five_plus_bed_rental"].filter(stateFilter);
       const rent = [rentAvg[0], rent1[0], rent2[0], rent3[0], rent4[0], rent5[0]];
       return getMaxFromData(rent)
-      // let tempMax;
-      // let maxRent = 0;
-      // for (let i=0; i<6; i++) {
-      //   console.log(rent[i])
-      //   console.log(rent[i].slice(state.startIndex, state.endIndex))
-      //   console.log(rent[i].slice(state.startIndex, state.endIndex).map(Number))
-      //   tempMax = Object.values(rent[i]).slice(state.startIndex, state.endIndex).map(Number).reduce(function(a,b){return Math.max(a,b)})
-      //   if (maxRent < tempMax) {
-      //     maxRent = tempMax;
-      //   }
-      // }
-      // return maxRent;
     }
 
   },
