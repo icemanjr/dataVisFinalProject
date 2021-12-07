@@ -33,6 +33,7 @@ app.get("/geojson", async (req, res) => {
 })
 
 app.get("/data", async (req, res) => {
+
     let results = {};
     let count = 0;
 

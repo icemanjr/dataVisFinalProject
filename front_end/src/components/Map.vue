@@ -28,7 +28,6 @@ export default class Map extends Vue {
     const fill = d3.scaleQuantile().range(colors);
     const getFillVal = d => parseFloat(d["2020-03-31"]) / parseFloat(d["2005-01-31"]) * 100;
     const w = d3.select(".map")
-    console.log(w, w._groups[0][0].getBoundingClientRect())
     fill.domain(d3.extent(data, d => getFillVal(d)));
 
     const svg = d3.select(".map")
