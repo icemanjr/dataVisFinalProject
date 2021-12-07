@@ -8,6 +8,7 @@
         :index="i"
         :category="param.category"
         :maxValue="param.maxValue"
+        :title="param.title"
       />
     </div>
   </div>
@@ -33,14 +34,15 @@ export default class Home extends Vue {
     return this.$store.getters["getMaxRent"];
   }
 
+
   params = [
-    {category: "all_homes", maxValue:this.maxBuy},
-    // {category: "one_bed", maxValue: this.maxBuy},
-    // {category: "two_bed", maxValue: this.maxBuy},
-    // {category: "three_bed", maxValue: this.maxBuy},
-    // {category: "four_bed", maxValue: this.maxBuy},
-    // {category: "five_plus_bed", maxValue: this.maxBuy},
-    {category: "all_homes_rental", maxValue: this.maxRent},
+    {category: "all_homes", maxValue:this.maxBuy, title:"All Homes"},
+    {category: "one_bed", maxValue: this.maxBuy, title:"One Bed"},
+    {category: "two_bed", maxValue: this.maxBuy, title:"Two Beds"},
+    {category: "three_bed", maxValue: this.maxBuy, title:"Three Beds"},
+    {category: "four_bed", maxValue: this.maxBuy, title: "Four Beds"},
+    {category: "five_plus_bed", maxValue: this.maxBuy, title: "Five+ Beds"},
+    {category: "all_homes_rental", maxValue: this.maxRent, title: "All Homes Rental"},
   ]
   mounted() {
     console.log(this.params)
@@ -61,8 +63,8 @@ export default class Home extends Vue {
   height: 900px;
   display: grid;
   width: 100%;
-  // grid-template-columns: 25% 25% 25% 25%;
-  grid-template-columns: 33% 33% 33% ;
+  grid-template-columns: 25% 25% 25% 25%;
+  // grid-template-columns: 33% 33% 33% ;
   grid-template-rows: 200px 200px 200px;
 }
 </style>

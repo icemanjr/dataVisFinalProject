@@ -20,8 +20,6 @@ export default new Vuex.Store({
   state: {
     data: null,
     selectedState: "California",
-    startIndex: 188,
-    endIndex: 295
   },
   getters: {
     getMaxBuy: (state) => {
@@ -40,7 +38,7 @@ export default new Vuex.Store({
     },
     getMaxRent: (state) => {
       function stateFilter(dat: any){
-        return dat.RegionName === state.selectedState;
+        return dat.state === state.selectedState;
       }
       const st = state as any
       const rentAvg = st.data["all_homes_rental"].filter(stateFilter);

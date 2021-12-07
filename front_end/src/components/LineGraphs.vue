@@ -1,5 +1,5 @@
 <template>
-    <div :id="`line-graph${index}`" class="line-graph"></div>
+    <div :id="`line-graph${index}`" class="line-graph">{{title}}</div>
 </template>
 
 <script lang="ts">
@@ -14,6 +14,7 @@ export default class LineGraphs extends Vue {
   @Prop() index!: number;
   @Prop() maxValue!: Function;
   @Prop() category!: string;
+  @Prop() title!: string;
   data = () => this.$store.state.data
   margins = {"top": 15, "bottom": 50, "left": 70, "right": 5}
   unwatch = null;
@@ -24,20 +25,17 @@ export default class LineGraphs extends Vue {
     function stateFilter(dat){
       return dat.state === selectedState;
     }
-    const filtered_data = data[this.category].filter(d => stateFilter(d))[0]
-    const filtered_data_keys = Object.keys(filtered_data).slice(7, filtered_data.length) // 7 is where the data starts... 
+    const filtered_data = data[this.category].filter(d => stateFilter(d))[0].data;
+    const filtered_data_keys = Object.keys(filtered_data)
     const width = d3.select (`#line-graph${this.index}`).node().getBoundingClientRect().width;
     const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height;
     const graphWidth = width/1.2 - this.margins.left - this.margins.right;
     const graphHeight = height/1.2 - this.margins.top - this.margins.bottom;
-    const startIndex = 188;
-    const endIndex = 295;
-
     const getYValue = (key) => filtered_data[key];
 
     const formatDate = key => {
       const splitDate = key.split("-")
-      return new Date(splitDate[0], splitDate[1] - 1, splitDate[2])
+      return new Date(splitDate[0], splitDate[1] - 1)
     }
     const xScale = d3.scaleTime()
         .range([0, graphWidth])
