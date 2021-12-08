@@ -57,8 +57,9 @@ export default class LineGraphs extends Vue {
       .attr("height", height + this.margins.top + this.margins.bottom);
 
     svg.append("text")
-        .text(`${this.title}`)
+        .text(`${selectedState} ${this.title}`)
         .attr("class", "title")
+        .attr("id", `title-${this.index}`)
         .attr("x", (this.margins.left + width/2))
         .attr("y", 15);
 
@@ -91,7 +92,6 @@ export default class LineGraphs extends Vue {
       .attr("fill", "none");
   }
   updateGraph(data, selectedState) {
-    console.log('updating graph')
 
     function stateFilter(dat) {
       return dat.state === selectedState;
@@ -101,8 +101,9 @@ export default class LineGraphs extends Vue {
     const height = d3.select(`#line-graph${this.index}`).node().getBoundingClientRect().height - this.margins.top - this.margins.bottom;
 
     const new_data = data.data[this.category].filter(d => stateFilter(d))[0];
+
+    d3.select(`#title-${this.index}`).text(`${selectedState} ${this.title}`)
     if (new_data?.data) {
-      console.log(new_data)
       const filtered_data = new_data.data;
       const filtered_data_keys = Object.keys(filtered_data)
       const getYValue = (key) => filtered_data[key];
@@ -137,6 +138,7 @@ export default class LineGraphs extends Vue {
           .attr('stroke', 'black')
           .attr("stroke-width", 2)
           .attr("fill", "none");
+
     } else {
       const yScale = d3.scaleLinear()
           .range([height, 0])
@@ -157,7 +159,6 @@ export default class LineGraphs extends Vue {
   
   mounted() {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
-      // console.log(mutation,state)
       if (mutation.type === "changeSelectedState") {
         this.updateGraph(state, state.selectedState)
       }

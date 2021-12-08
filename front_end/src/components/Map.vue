@@ -1,6 +1,6 @@
 <template>
   <div class="map">
-    <p>{{selected()}}</p>
+    <p></p>
   </div>
 </template>
 
