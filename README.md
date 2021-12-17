@@ -10,6 +10,7 @@ To get this project up and running.
 2. cd to ../server
    - run `npm i`
    - run `node server.py`
+
 In a separate terminal window
 3. cd to ../front_end
    - run `npm i`
